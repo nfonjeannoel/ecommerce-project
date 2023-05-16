@@ -1,4 +1,3 @@
-```markdown
 # Ecommerce Project
 
 This is an ecommerce project that provides a backend API for managing users, addresses, products, and orders. It is built using FastAPI, SQLAlchemy, and Alembic.
