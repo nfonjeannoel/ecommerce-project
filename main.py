@@ -3,6 +3,7 @@ from typing import List
 
 from fastapi import FastAPI, HTTPException
 from fastapi.params import Depends
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 import models
 import schemas
@@ -19,8 +20,17 @@ def get_db():
         db.close()
 
 
+# users
+
 @app.post("/users", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    # Check if the username or email is already taken
+    existing_user = db.query(models.User).filter(
+        or_(models.User.username == user.username, models.User.email == user.email)
+    ).first()
+    if existing_user:
+        raise HTTPException(status_code=409, detail="Username or email already taken")
+
     db_user = models.User(username=user.username, email=user.email, password=user.password)
     db.add(db_user)
     db.commit()
